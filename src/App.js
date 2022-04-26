@@ -1,7 +1,11 @@
 import notion_dark from "./notion-dark.png";
+import notion from "./notion.png"
 import { FiGithub } from "react-icons/fi";
+import { useState } from "react";
+
 function App() {
   let counter = 0;
+  const [hovered, setHovered] = useState(false);
 
   const stepNumbering = () => <b>{++counter + ". "}</b>
 
@@ -12,8 +16,8 @@ function App() {
         <div className="body space-y-5 border-y-2 border-black py-4">
           <div className="notion-auth border-2 border-red-500 rounded-md p-4">
             <div className="mb-2">Please click the button below to reauthorize with Notion.</div>
-            <button className="flex items-center">
-              <img src={notion_dark} alt="N" className="object-scale-down h-8 mr-2" />
+            <button className="flex items-center" onMouseOver={() => setHovered(true)} onMouseLeave={()=>setHovered(false)}>
+              <img src={hovered ? notion : notion_dark} alt="N" className="object-scale-down h-8 mr-2" />
               Add to Notion
             </button>
 
