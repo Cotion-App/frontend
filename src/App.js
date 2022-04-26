@@ -8,24 +8,54 @@ import toast, { Toaster } from 'react-hot-toast';
 function App() {
   let counter = 0;
   const [hovered, setHovered] = useState(false);
+  const [canvasToken, setCanvasToken] = useState("")
+  const [courseURL, setCourseURL] = useState("")
 
   const stepNumbering = () => <b>{++counter + ". "}</b>
 
+  const handleClick = () => {
+    // handle course_url parsing
+    let domain = parseCourseDomain(courseURL)
+    toast("domain: " + domain)
+    let courseID = between(courseURL, "/courses/", "/")
+    toast("courseID: " + courseID)
+
+  }
+
+
+  const parseCourseDomain = (url) => {
+    let canvas_domain = ""
+    try {
+      canvas_domain = new URL(url).hostname;
+    } catch (e) {
+      toast.error("Invalid URL. Please check your entry.");
+      return;
+    }
+
+    return canvas_domain
+  }
+
+
+
+  const between = (str, a, b) => {
+    return str.split("/")[4]
+  }
+
   return (
     <div className="App">
-        <Toaster position="top-right" reverseOrder = {false}/>
+      <Toaster position="top-right" reverseOrder={false} />
       <div className="content font-serif md:w-4/6 mx-auto p-5 max-w-xl select-none">
         <div className="header text-3xl pb-2 font-bold"> Cotion </div>
         <div className="body space-y-5 border-y-2 border-black py-4">
           <div className="notion-auth border-2 border-red-500 rounded-md p-4">
             <div className="mb-2">Please click the button below to reauthorize with Notion.</div>
-            <button className="flex items-center" onMouseOver={() => setHovered(true)} onMouseLeave={()=>setHovered(false)} onClick = {() => toast.error('hello' ,{className: "font-serif"})}>
+            <button className="flex items-center" onMouseOver={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
               <img src={hovered ? notion : notion_dark} alt="N" className="object-scale-down h-8 mr-2" />
               Add to Notion
             </button>
           </div>
           <div className="paste-link flex">
-            {stepNumbering()} Paste the link to your course here: <input />
+            {stepNumbering()} Paste the link to your course here: <input onChange={e => setCourseURL(e.target.value)} />
           </div>
 
           <div className="alias-class flex">
@@ -34,7 +64,7 @@ function App() {
 
           <div className="canvas-access-token">
             {stepNumbering()} Go to Canvas settings, scroll down, and click
-            '+ New Access Token'. Paste your Access Token here:<input />
+            '+ New Access Token'. Paste your Access Token here:<input onChange={e => setCanvasToken(e.target.value)} />
             <div className="local-storage text-sm ml-5 flex items-center">
               <input class="form-check-input rounded-sm mr-2 checked:hover:bg-black checked:bg-black"
                 type="checkbox" />
@@ -57,7 +87,7 @@ function App() {
             {stepNumbering()} While you're in the 'Share' panel,
             copy the link to the table and paste it here:<input />
           </div>
-          <div>{stepNumbering()} If you have followed all of the above steps, press <button className="ml-2 py-1">Go</button></div>
+          <div>{stepNumbering()} If you have followed all of the above steps, press <button className="ml-2 py-1" onClick={() => handleClick()}>Go</button></div>
         </div>
         <div className="footer mb-10 py-2 text-gray-400 flex items-center font-sans">
           Made by Abhiram Ghanta
