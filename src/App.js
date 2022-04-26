@@ -7,9 +7,9 @@ function App() {
 
   return (
     <div className="App">
-      <div className="content font-serif w-full md:w-1/2 mx-auto p-5">
+      <div className="content font-serif md:w-4/6 mx-auto p-5 max-w-xl">
         <div className="header text-3xl pb-2 font-bold"> Cotion</div>
-        <div className="body space-y-3 border-y-2 border-black py-4">
+        <div className="body space-y-5 border-y-2 border-black py-4">
           <div className="notion-auth border-2 border-red-500 rounded-md p-4">
             <div className="mb-2">Please click the button below to reauthorize with Notion.</div>
             <button className="flex items-center">
