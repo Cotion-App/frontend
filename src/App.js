@@ -3,6 +3,7 @@ import notion from "./notion.png"
 import { FiGithub } from "react-icons/fi";
 import { useState } from "react";
 import toast, { Toaster } from 'react-hot-toast';
+import {InvalidCourseIDError, InvalidDomainError} from './errors.js'
 
 
 function App() {
@@ -14,31 +15,43 @@ function App() {
   const stepNumbering = () => <b>{++counter + ". "}</b>
 
   const handleClick = () => {
-    // handle course_url parsing
-    let domain = parseCourseDomain(courseURL)
-    toast("domain: " + domain)
-    let courseID = between(courseURL, "/courses/", "/")
-    toast("courseID: " + courseID)
+    getAssignments()
+    // addToNotion
 
   }
 
-
-  const parseCourseDomain = (url) => {
-    let canvas_domain = ""
+  const getAssignments = () => {
+    
+    //
+    let domain = ""
+    let courseID = ""
+    
     try {
-      canvas_domain = new URL(url).hostname;
-    } catch (e) {
-      toast.error("Invalid URL. Please check your entry.");
+      domain = new URL(courseURL).hostname
+
+      if (`${/[a-zA-Z0-9]*\.instructure\.com/.test(domain)}` === 'false'){
+        throw InvalidDomainError
+      }
+
+      courseID = courseURL.split("/")[4]
+
+      if (`${/[0-9]{6}/.test(courseID)}` === 'false'){
+        throw InvalidCourseIDError
+      }
+
+    } catch (e){
+      if (e instanceof TypeError){
+        toast.error("Invalid URL Format.")
+      } else if (e instanceof InvalidDomainError) {
+        toast.error("Invalid Domain Format.")
+      } else if (e instanceof InvalidCourseIDError){
+        toast.error("Invalid CourseID Format.")
+      }
+
       return;
     }
 
-    return canvas_domain
-  }
 
-
-
-  const between = (str, a, b) => {
-    return str.split("/")[4]
   }
 
   return (
