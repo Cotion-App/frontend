@@ -4,6 +4,8 @@ import { FiGithub } from "react-icons/fi";
 import { useState } from "react";
 import toast, { Toaster } from 'react-hot-toast';
 import {InvalidCourseIDError, InvalidDomainError} from './errors.js'
+import { getThings } from "./utils.js";
+
 
 
 function App() {
@@ -50,7 +52,7 @@ function App() {
 
       return;
     }
-
+    getThings(domain, canvasToken, courseID)
 
   }
 
