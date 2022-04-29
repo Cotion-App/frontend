@@ -1,10 +1,11 @@
-import notion_dark from "./notion-dark.png";
-import notion from "./notion.png"
+import notion_dark from "./media/notion-dark.png";
+import notion from "./media/notion.png"
 import { FiGithub } from "react-icons/fi";
 import { useState } from "react";
 import toast, { Toaster } from 'react-hot-toast';
-import {InvalidCourseIDError, InvalidDomainError} from './errors.js'
-import { getThings } from "./utils.js";
+import {InvalidCourseIDError, InvalidDomainError} from './utils/errors.js'
+import { getThings } from "./utils/utils.js";
+
 
 
 
@@ -60,7 +61,7 @@ function App() {
     <div className="App">
       <Toaster position="top-right" reverseOrder={false} />
       <div className="content font-serif md:w-4/6 mx-auto p-5 max-w-xl select-none">
-        <div className="header text-3xl pb-2 font-bold"> Cotion </div>
+        <div className="header text-3xl pb-2 font-bold"> Cotion</div>
         <div className="body space-y-5 border-y-2 border-black py-4">
           <div className="notion-auth border-2 border-red-500 rounded-md p-4">
             <div className="mb-2">Please click the button below to reauthorize with Notion.</div>
