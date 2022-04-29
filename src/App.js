@@ -89,7 +89,7 @@ function App() {
           </div>
 
           <div className="duplicate-notion-table">
-            {stepNumbering()} Duplicate this <a href="https://google.com/" target="_blank" className="underline" rel="noreferrer">Notion Table</a> to your own workspace.
+            {stepNumbering()} Duplicate this <a href="https://spectacled-rainforest-118.notion.site/97429db8eadd429b8914ca480516dabc?v=ada252446d0f45bea222df0fec729abe" target="_blank" className="underline" rel="noreferrer">Notion Table</a> to your own workspace.
             Feel free to add additional columns to the table,
             but don't remove any existing columns!
           </div>
