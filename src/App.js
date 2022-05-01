@@ -1,10 +1,8 @@
 import { FiGithub } from "react-icons/fi";
 import { useState } from "react";
 import toast, { Toaster } from 'react-hot-toast';
-import {InvalidCourseIDError, InvalidDomainError} from './utils/errors.js'
-import { getThings } from "./utils/utils.js";
-
-
+import { InvalidDomainError } from './utils/errors.js'
+import { getAssignments } from "./utils/utils.js";
 
 
 function App() {
@@ -13,69 +11,72 @@ function App() {
   const [courseName, setCourseName] = useState('')
   const [databaseURL, setDatabaseURL] = useState('')
 
+  // numbered rendering in output
   const stepNumbering = () => <b>{++counter + ". "}</b>
 
-  const handleClick = () => {
+  // url parsing logic
+  const validateURL = (url, format, host) => {
     let domain = ""
-    let courseID = ""
-    
     try {
-      domain = new URL(courseURL).hostname
+      domain = new URL(url).hostname
 
-      if (`${/[a-zA-Z0-9]*\.instructure\.com/.test(domain)}` === 'false'){
+      if (`${format.test(domain)}` === 'false') {
         throw InvalidDomainError
       }
-
-      courseID = courseURL.split("/")[4]
-      
-      if (`${/[0-9]{6}/.test(courseID)}` === 'false'){
-        throw InvalidCourseIDError
-      }
-
-    } catch (e){
-      if (e instanceof TypeError){
-        if (courseURL.length === 0){
-          toast.error("You have not entered in a course URL yet.")
+      return domain;
+    } catch (e) {
+      if (e instanceof TypeError) {
+        if (url.length === 0) {
+          toast.error(`You have not entered in a ${host} URL yet.`)
         } else {
-          toast.error("Invalid course URL Format.")
+          toast.error(`Invalid ${host} URL Format.`)
         }
 
       } else if (e instanceof InvalidDomainError) {
-        toast.error("Invalid Canvas Domain Format.")
-      } else if (e instanceof InvalidCourseIDError){
-        toast.error("Invalid CourseID Format.")
+        toast.error(`Invalid ${host} Domain Format.`)
       }
+      return 'error';
+    }
+  }
 
+  const handleClick = () => {
+    let canvasDomain = validateURL(courseURL, /[a-zA-Z0-9]*\.instructure\.com/, 'Canvas')
+    if (canvasDomain === 'error'){
       return;
     }
 
-    if (courseName === ''){
+    let courseID = courseURL.split("/")[4]
+    if (`${/[0-9]{6}/.test(courseID)}` === 'false') {
+      toast.error("Invalid CourseID Format.")
+      return;
+    }
+
+    if (courseName === '') {
       toast.error("Empty Course Alias")
       return;
     }
 
-    try{
-      let databaseDomain = new URL(databaseURL).hostname
-      toast(databaseDomain)
-      if (`${/notion\.so/.test(databaseDomain)}` === 'false'){
-        toast.error("Invalid Notion Domain Format.")
-        return;
-      }
-    } catch (e){
-      if (e instanceof TypeError){
-        if (databaseURL.length === 0){
-          toast.error("You have not entered in a database URL yet.")
-        } else {
-          toast.error("Invalid database URL Format.")
-        } 
+    let databaseDomain = validateURL(databaseURL, /notion\.so/, 'Notion')
+    if (databaseDomain === 'error'){
+      return;
+    }
+    
+    // maybe add parsing to verify dbID correctness
+    let dbID = databaseURL.split('/')[4].split("?")[0]
 
-      } 
+    
+    let out = getAssignments(canvasDomain, courseID, courseName, dbID)
+
+    // tell user if anything went wrong
+    if (out === 'success') {
+      toast.success(out)
+    } else {
+      toast.error(out)
     }
 
-    let dbID = databaseURL.split('/')[4].split("?")[0]
-    getThings(domain, courseID, courseName, dbID)
-
   }
+
+
 
 
 
@@ -90,7 +91,7 @@ function App() {
           </div>
 
           <div className="alias-class flex">
-            {stepNumbering()} Create an alias for your course: <input onChange = {e => setCourseName(e.target.value)}/>
+            {stepNumbering()} Create an alias for your course: <input onChange={e => setCourseName(e.target.value)} />
           </div>
 
           <div className="duplicate-notion-table">
@@ -101,7 +102,7 @@ function App() {
 
           <div className="share-token">
             {stepNumbering()} While you're in the 'Share' panel,
-            copy the link to the table and paste it here:<input onChange={e=> setDatabaseURL(e.target.value)}/>
+            copy the link to the table and paste it here:<input onChange={e => setDatabaseURL(e.target.value)} />
           </div>
           <div>{stepNumbering()} If you have followed all of the above steps, press <button className="ml-2 py-1" onClick={() => handleClick()}>Go</button></div>
         </div>
