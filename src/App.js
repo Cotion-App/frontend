@@ -10,6 +10,9 @@ function App() {
   const [courseURL, setCourseURL] = useState('')
   const [courseName, setCourseName] = useState('')
   const [databaseURL, setDatabaseURL] = useState('')
+  const [canvasToken, setCanvasToken] = useState(localStorage.getItem('canvasToken'))
+
+  const [localSave, setLocalSave] = useState(localStorage.getItem('canvasToken') != null)
 
   // numbered rendering in output
   const stepNumbering = () => <b>{++counter + ". "}</b>
@@ -38,7 +41,8 @@ function App() {
     }
   }
 
-  const handleClick = () => {
+  // used to handle "Go" button click
+  const handleGoClick = () => {
     let canvasDomain = ""
     let courseID = ""
     let dbID = ""
@@ -55,6 +59,11 @@ function App() {
         throw Error("Empty Course Alias")
       }
 
+      if (canvasToken === ''){
+        throw Error("Empty Canvas Token")
+      }
+      handleSave()
+      
       validateURL(databaseURL, /notion\.so/, 'Notion')
 
       dbID = databaseURL.split('/')[4].split("?")[0]
@@ -63,7 +72,7 @@ function App() {
       return;
     }
 
-    let out = getAssignments(canvasDomain, courseID, courseName, dbID)
+    let out = getAssignments(canvasDomain, canvasToken,courseID, courseName, dbID)
 
     // tell user if anything went wrong
     if (out === 'success') {
@@ -72,6 +81,19 @@ function App() {
       toast.error(out)
     }
 
+    
+
+  }
+
+  // function used to handle local storage saving
+  const handleSave = () => {
+    if (localSave){
+      if (canvasToken.length > 0) {
+        localStorage.setItem('canvasToken', canvasToken)
+      } 
+    } else {
+      localStorage.removeItem('canvasToken')
+    }
   }
 
   return (
@@ -83,9 +105,18 @@ function App() {
           <div className="paste-link flex">
             {stepNumbering()} Paste the link to your course here: <input onChange={e => setCourseURL(e.target.value)} />
           </div>
-
           <div className="alias-class flex">
             {stepNumbering()} Create an alias for your course: <input onChange={e => setCourseName(e.target.value)} />
+          </div>
+
+          <div className="canvas-access-token">
+            {stepNumbering()} Go to Canvas settings, scroll down, and click
+            '+ New Access Token'. Paste your Access Token here:<input value = {canvasToken} onChange={e => setCanvasToken(e.target.value)} />
+            <div className="local-storage text-sm ml-5 flex items-center">
+              <input class="form-check-input rounded-sm mr-2 checked:hover:bg-black checked:bg-black"
+                type="checkbox" checked = {localSave} onChange = {e => setLocalSave(e.target.checked)}/>
+              Do you want to save this information to local storage?
+            </div>
           </div>
 
           <div className="duplicate-notion-table">
@@ -94,11 +125,15 @@ function App() {
             but don't remove any existing columns!
           </div>
 
+          <div className="share-table">
+            {stepNumbering()} Share the duplicated table with me on Notion.
+          </div>
+
           <div className="share-token">
             {stepNumbering()} While you're in the 'Share' panel,
             copy the link to the table and paste it here:<input onChange={e => setDatabaseURL(e.target.value)} />
           </div>
-          <div>{stepNumbering()} If you have followed all of the above steps, press <button className="ml-2 py-1" onClick={() => handleClick()}>Go</button></div>
+          <div>{stepNumbering()} If you have followed all of the above steps, press <button className="ml-2 py-1" onClick={() => handleGoClick()}>Go</button></div>
         </div>
         <div className="footer mb-10 py-2 text-gray-400 flex items-center font-sans">
           Made by Abhiram Ghanta
