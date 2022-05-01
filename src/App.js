@@ -72,13 +72,11 @@ function App() {
       return;
     }
 
-    // let out = await go(canvasDomain, canvasToken, courseID, courseName, dbID)
-
     const myPromise = go(canvasDomain, canvasToken, courseID, courseName, dbID);
     
     toast.promise(myPromise, {
       loading: 'Loading',
-      success: myPromise,
+      success: (success) => `${success}`,
       error: (err) => `${err.response.data}`,
     });
 
