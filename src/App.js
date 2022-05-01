@@ -2,7 +2,7 @@ import { FiGithub } from "react-icons/fi";
 import { useState } from "react";
 import toast, { Toaster } from 'react-hot-toast';
 import { InvalidDomainError } from './utils/errors.js'
-import { getAssignments } from "./utils/utils.js";
+import { go } from "./utils/utils.js";
 
 
 function App() {
@@ -72,7 +72,7 @@ function App() {
       return;
     }
 
-    let out = getAssignments(canvasDomain, canvasToken,courseID, courseName, dbID)
+    let out = go(canvasDomain, canvasToken,courseID, courseName, dbID)
 
     // tell user if anything went wrong
     if (out === 'success') {
