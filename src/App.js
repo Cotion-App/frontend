@@ -59,11 +59,11 @@ function App() {
         throw Error("Empty Course Alias")
       }
 
-      if (canvasToken === ''){
+      if (canvasToken === '') {
         throw Error("Empty Canvas Token")
       }
       handleSave()
-      
+
       validateURL(databaseURL, /notion\.so/, 'Notion')
 
       dbID = databaseURL.split('/')[4].split("?")[0]
@@ -72,25 +72,24 @@ function App() {
       return;
     }
 
-    let out = await go(canvasDomain, canvasToken,courseID, courseName, dbID)
+    // let out = await go(canvasDomain, canvasToken, courseID, courseName, dbID)
 
-    // tell user if anything went wrong
-    if (out === 'success') {
-      toast.success(out)
-    } else {
-      toast.error(out)
-    }
-
+    const myPromise = go(canvasDomain, canvasToken, courseID, courseName, dbID);
     
+    toast.promise(myPromise, {
+      loading: 'Loading',
+      success: myPromise,
+      error: (err) => `${err.response.data}`,
+    });
 
   }
 
   // function used to handle local storage saving
   const handleSave = () => {
-    if (localSave){
+    if (localSave) {
       if (canvasToken.length > 0) {
         localStorage.setItem('canvasToken', canvasToken)
-      } 
+      }
     } else {
       localStorage.removeItem('canvasToken')
     }
@@ -111,10 +110,10 @@ function App() {
 
           <div className="canvas-access-token">
             {stepNumbering()} Go to Canvas settings, scroll down, and click
-            '+ New Access Token'. Paste your Access Token here:<input value = {canvasToken} onChange={e => setCanvasToken(e.target.value)} />
+            '+ New Access Token'. Paste your Access Token here:<input value={canvasToken} onChange={e => setCanvasToken(e.target.value)} />
             <div className="local-storage text-sm ml-5 flex items-center">
-              <input class="form-check-input rounded-sm mr-2 checked:hover:bg-black checked:bg-black"
-                type="checkbox" checked = {localSave} onChange = {e => setLocalSave(e.target.checked)}/>
+              <input className="form-check-input rounded-sm mr-2 checked:hover:bg-black checked:bg-black"
+                type="checkbox" checked={localSave} onChange={e => setLocalSave(e.target.checked)} />
               Do you want to save this information to local storage?
             </div>
           </div>
@@ -126,7 +125,7 @@ function App() {
           </div>
 
           <div className="share-table">
-            {stepNumbering()} Share the duplicated table with me on Notion.
+            {stepNumbering()} Share the duplicated table with me <span className="italic">(aghanta3@gatech.edu)</span> on Notion.
           </div>
 
           <div className="share-token">
