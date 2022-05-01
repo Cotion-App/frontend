@@ -5,6 +5,6 @@ export async function go(domain, canvasToken,courseID, courseName, dbID) {
   return (
     axios
       .get(`${BACKEND_URL}/run/${domain}/${canvasToken}/${courseID}/${courseName}/${dbID}`)
-      .then((response) => console.log(response.data))
+      .then(response => response.data)
   );
 }

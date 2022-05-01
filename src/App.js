@@ -42,7 +42,7 @@ function App() {
   }
 
   // used to handle "Go" button click
-  const handleGoClick = () => {
+  const handleGoClick = async () => {
     let canvasDomain = ""
     let courseID = ""
     let dbID = ""
@@ -72,7 +72,7 @@ function App() {
       return;
     }
 
-    let out = go(canvasDomain, canvasToken,courseID, courseName, dbID)
+    let out = await go(canvasDomain, canvasToken,courseID, courseName, dbID)
 
     // tell user if anything went wrong
     if (out === 'success') {
