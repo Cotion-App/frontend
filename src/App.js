@@ -9,20 +9,13 @@ import { getThings } from "./utils/utils.js";
 
 function App() {
   let counter = 0;
-  const [canvasToken, setCanvasToken] = useState("")
-  const [courseURL, setCourseURL] = useState("")
+  const [courseURL, setCourseURL] = useState('')
+  const [courseName, setCourseName] = useState('')
+  const [databaseURL, setDatabaseURL] = useState('')
 
   const stepNumbering = () => <b>{++counter + ". "}</b>
 
   const handleClick = () => {
-    getAssignments()
-    // addToNotion
-
-  }
-
-  const getAssignments = () => {
-    
-    //
     let domain = ""
     let courseID = ""
     
@@ -34,25 +27,57 @@ function App() {
       }
 
       courseID = courseURL.split("/")[4]
-
+      
       if (`${/[0-9]{6}/.test(courseID)}` === 'false'){
         throw InvalidCourseIDError
       }
 
     } catch (e){
       if (e instanceof TypeError){
-        toast.error("Invalid URL Format.")
+        if (courseURL.length === 0){
+          toast.error("You have not entered in a course URL yet.")
+        } else {
+          toast.error("Invalid course URL Format.")
+        }
+
       } else if (e instanceof InvalidDomainError) {
-        toast.error("Invalid Domain Format.")
+        toast.error("Invalid Canvas Domain Format.")
       } else if (e instanceof InvalidCourseIDError){
         toast.error("Invalid CourseID Format.")
       }
 
       return;
     }
-    getThings(domain, canvasToken, courseID)
+
+    if (courseName === ''){
+      toast.error("Empty Course Alias")
+      return;
+    }
+
+    try{
+      let databaseDomain = new URL(databaseURL).hostname
+      toast(databaseDomain)
+      if (`${/notion\.so/.test(databaseDomain)}` === 'false'){
+        toast.error("Invalid Notion Domain Format.")
+        return;
+      }
+    } catch (e){
+      if (e instanceof TypeError){
+        if (databaseURL.length === 0){
+          toast.error("You have not entered in a database URL yet.")
+        } else {
+          toast.error("Invalid database URL Format.")
+        } 
+
+      } 
+    }
+
+    let dbID = databaseURL.split('/')[4].split("?")[0]
+    getThings(domain, courseID, courseName, dbID)
 
   }
+
+
 
   return (
     <div className="App">
@@ -65,12 +90,7 @@ function App() {
           </div>
 
           <div className="alias-class flex">
-            {stepNumbering()} Create an alias for your course: <input />
-          </div>
-
-          <div className="canvas-access-token">
-            {stepNumbering()} Go to Canvas settings, scroll down, and click
-            '+ New Access Token'. Paste your Access Token here:<input onChange={e => setCanvasToken(e.target.value)} />
+            {stepNumbering()} Create an alias for your course: <input onChange = {e => setCourseName(e.target.value)}/>
           </div>
 
           <div className="duplicate-notion-table">
@@ -79,12 +99,9 @@ function App() {
             but don't remove any existing columns!
           </div>
 
-          <div className="share-table">
-            {stepNumbering()} Share the duplicated table with Abhiram Ghanta on Notion.
-          </div>
           <div className="share-token">
             {stepNumbering()} While you're in the 'Share' panel,
-            copy the link to the table and paste it here:<input />
+            copy the link to the table and paste it here:<input onChange={e=> setDatabaseURL(e.target.value)}/>
           </div>
           <div>{stepNumbering()} If you have followed all of the above steps, press <button className="ml-2 py-1" onClick={() => handleClick()}>Go</button></div>
         </div>
