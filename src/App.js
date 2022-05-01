@@ -27,44 +27,42 @@ function App() {
     } catch (e) {
       if (e instanceof TypeError) {
         if (url.length === 0) {
-          toast.error(`You have not entered in a ${host} URL yet.`)
+          throw Error(`You have not entered in a ${host} URL yet.`)
         } else {
-          toast.error(`Invalid ${host} URL Format.`)
+          throw Error(`Invalid ${host} URL Format.`)
         }
 
       } else if (e instanceof InvalidDomainError) {
-        toast.error(`Invalid ${host} Domain Format.`)
+        throw Error(`Invalid ${host} Domain Format.`)
       }
-      return 'error';
     }
   }
 
   const handleClick = () => {
-    let canvasDomain = validateURL(courseURL, /[a-zA-Z0-9]*\.instructure\.com/, 'Canvas')
-    if (canvasDomain === 'error'){
+    let canvasDomain = ""
+    let courseID = ""
+    let dbID = ""
+
+    try {
+      canvasDomain = validateURL(courseURL, /[a-zA-Z0-9]*\.instructure\.com/, 'Canvas')
+
+      courseID = courseURL.split("/")[4]
+      if (`${/[0-9]{6}/.test(courseID)}` === 'false') {
+        throw Error("Invalid CourseID Format.")
+      }
+
+      if (courseName === '') {
+        throw Error("Empty Course Alias")
+      }
+
+      validateURL(databaseURL, /notion\.so/, 'Notion')
+
+      dbID = databaseURL.split('/')[4].split("?")[0]
+    } catch (e) {
+      toast.error(e.message)
       return;
     }
 
-    let courseID = courseURL.split("/")[4]
-    if (`${/[0-9]{6}/.test(courseID)}` === 'false') {
-      toast.error("Invalid CourseID Format.")
-      return;
-    }
-
-    if (courseName === '') {
-      toast.error("Empty Course Alias")
-      return;
-    }
-
-    let databaseDomain = validateURL(databaseURL, /notion\.so/, 'Notion')
-    if (databaseDomain === 'error'){
-      return;
-    }
-    
-    // maybe add parsing to verify dbID correctness
-    let dbID = databaseURL.split('/')[4].split("?")[0]
-
-    
     let out = getAssignments(canvasDomain, courseID, courseName, dbID)
 
     // tell user if anything went wrong
@@ -76,13 +74,9 @@ function App() {
 
   }
 
-
-
-
-
   return (
     <div className="App">
-      <Toaster position="top-right" reverseOrder={false} />
+      <Toaster position="top-right" />
       <div className="content font-serif md:w-4/6 mx-auto p-5 max-w-xl select-none">
         <div className="header text-3xl pb-2 font-bold"> Cotion</div>
         <div className="body space-y-5 border-y-2 border-black py-4">
@@ -108,7 +102,7 @@ function App() {
         </div>
         <div className="footer mb-10 py-2 text-gray-400 flex items-center font-sans">
           Made by Abhiram Ghanta
-          <a href="https://github.com/Cotion-App/frontend" target="_blank" rel="noreferrer">
+          <a href="https://github.com/Cotion-App/" target="_blank" rel="noreferrer">
             <FiGithub className="ml-2 hover:text-black" /></a>
         </div>
       </div>
