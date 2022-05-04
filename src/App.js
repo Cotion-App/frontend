@@ -4,18 +4,12 @@ import toast, { Toaster } from 'react-hot-toast';
 import { go, notionAuth } from "./utils/utils.js";
 import { FRONTEND_URL } from "./utils/constants.js";
 
-
-import notion_dark from "./media/notion-dark.png";
-import notion from "./media/notion.png"
-
-
 function App() {
   let counter = 0;
-  const [hovered, setHovered] = useState(false);
-  const [courseURL, setCourseURL] = useState('https://gatech.instructure.com/courses/236210')
-  const [courseName, setCourseName] = useState('cs1332')
-  const [databaseURL, setDatabaseURL] = useState('https://www.notion.so/abhig21/e8f06f32275c45a48dcbe56ec9250aed?v=45661fa5ba544cafa37d6dd6d6f62bab')
-  const [canvasToken, setCanvasToken] = useState(localStorage.getItem('canvasToken'))
+  const [courseURL, setCourseURL] = useState('')
+  const [courseName, setCourseName] = useState('')
+  const [databaseURL, setDatabaseURL] = useState('')
+  const [canvasToken, setCanvasToken] = useState('')
   const [auth, setAuth] = useState(false)
 
 
@@ -124,20 +118,13 @@ function App() {
   return (
     <div className="App">
       <Toaster position="top-right" />
-      <div className="content font-serif md:w-4/6 mx-auto p-5 max-w-xl select-none">
+      <div className="content font-serif md:w-5/6 mx-auto p-5 max-w-xl select-none">
         <div className="header text-3xl pb-2 font-bold"> Cotion</div>
         <div className="body space-y-5 border-y-2 border-black py-4">
-          {!auth ? <div className="notion-auth border-2 border-red-500 rounded-md p-4">
-            <div className="mb-2">Please click the button below to reauthorize with Notion.</div>
-            <button className="flex items-center" onMouseOver={() => setHovered(true)} onMouseLeave={() => setHovered(false)} onClick={() => window.open(`https://api.notion.com/v1/oauth/authorize?owner=user&client_id=5d758e52-4e9c-4b07-86ad-fd11ee2565aa&redirect_uri=https://${FRONTEND_URL}&response_type=code`, "_self")}>
-              <img src={hovered ? notion : notion_dark} alt="N" className="object-scale-down h-8 mr-2" />
-              Add to Notion
-            </button>
-          </div> : false}
-          <div className="paste-link flex">
+          <div className="paste-link">
             {stepNumbering()}Paste the link to your course here: <input value={courseURL} onChange={e => setCourseURL(e.target.value)} />
           </div>
-          <div className="alias-class flex">
+          <div className="alias-class">
             {stepNumbering()} Create an alias for your course: <input value={courseName} onChange={e => setCourseName(e.target.value)} />
           </div>
 
@@ -147,13 +134,18 @@ function App() {
           </div>
 
           <div className="duplicate-notion-table">
-            {stepNumbering()} Duplicate this <a href="https://spectacled-rainforest-118.notion.site/97429db8eadd429b8914ca480516dabc?v=ada252446d0f45bea222df0fec729abe" target="_blank" className="underline" rel="noreferrer">Notion Table</a> to your own workspace.
-            Feel free to add additional columns to the table,
-            but don't remove any existing columns!
+            {stepNumbering()} Duplicate this <a href="https://spectacled-rainforest-118.notion.site/97429db8eadd429b8914ca480516dabc?v=ada252446d0f45bea222df0fec729abe" target="_blank" rel="noreferrer">Notion Table</a>.
+            Feel free to add additional columns to the table, but don't remove any existing columns!
           </div>
 
+          {!auth ?
+            <div className="authorize-with-notion">
+              {stepNumbering()}Please click <a href={`https://api.notion.com/v1/oauth/authorize?owner=user&client_id=5d758e52-4e9c-4b07-86ad-fd11ee2565aa&redirect_uri=https://${FRONTEND_URL}&response_type=code`}>here</a> below to authorize with Notion. This step should disappear if you have authorized with Notion.
+            </div> : false}
+
+
           <div className="share-table">
-            {stepNumbering()} Share the duplicated table with me <span className="italic">(aghanta3@gatech.edu)</span> on Notion.
+            {stepNumbering()} Share the duplicated table with the 'Cotion' using the 'Share' button in the top right.
           </div>
 
           <div className="share-token">

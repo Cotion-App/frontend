@@ -11,6 +11,10 @@ button {
           duration-200
 }
 
+a {
+  @apply underline
+}
+
 input {
   @apply border-2 border-black 
          rounded-md ml-2
