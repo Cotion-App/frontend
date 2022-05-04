@@ -1,7 +1,6 @@
 import { FiGithub } from "react-icons/fi";
 import { useEffect, useState } from "react";
 import toast, { Toaster } from 'react-hot-toast';
-import { InvalidDomainError } from './utils/errors.js'
 import { go, notionAuth } from "./utils/utils.js";
 import { FRONTEND_URL } from "./utils/constants.js";
 
@@ -22,8 +21,6 @@ function App() {
   const [notionToken, setNotionToken] = useState('')
 
 
-
-
   useEffect(() => {
 
     const notion_auth = async () => {
@@ -32,12 +29,12 @@ function App() {
 
       if (queryParams.get('code') != null) {
         setAuth(true)
-        let auth_token = await notionAuth(queryParams.get('code'), FRONTEND_URL)
-        if (auth_token === "code_already_in_use") {
+        let res = await notionAuth(queryParams.get('code'), FRONTEND_URL)
+        if (res === 401) {
           let clean_uri = uri.substring(0, uri.indexOf("?"));
           window.history.replaceState({}, document.title, clean_uri);
         }
-        setNotionToken(auth_token)
+        setNotionToken(res)
       }
     }
 

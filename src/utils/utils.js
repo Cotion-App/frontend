@@ -14,5 +14,6 @@ export async function notionAuth(tempCode, redirectURI) {
     axios
       .get(`${BACKEND_URL}/notion/${tempCode}/${redirectURI}`)
       .then(response => response.data)
+      .catch(error => error.response.status)
   );
 }
