@@ -12,36 +12,39 @@ import notion from "./media/notion.png"
 function App() {
   let counter = 0;
   const [hovered, setHovered] = useState(false);
-  const [courseURL, setCourseURL] = useState('')
-  const [courseName, setCourseName] = useState('')
-  const [databaseURL, setDatabaseURL] = useState('')
+  const [courseURL, setCourseURL] = useState('https://gatech.instructure.com/courses/236210')
+  const [courseName, setCourseName] = useState('cs1332')
+  const [databaseURL, setDatabaseURL] = useState('https://www.notion.so/abhig21/e8f06f32275c45a48dcbe56ec9250aed?v=45661fa5ba544cafa37d6dd6d6f62bab')
   const [canvasToken, setCanvasToken] = useState(localStorage.getItem('canvasToken'))
-  const [localSave, setLocalSave] = useState(localStorage.getItem('canvasToken') != null)
   const [auth, setAuth] = useState(false)
-  const [notionToken, setNotionToken] = useState('')
 
 
-  useEffect(() => {
 
-    const notion_auth = async () => {
-      let uri = window.location.toString()
-      const queryParams = new URLSearchParams(uri.split('/')[3])
 
-      if (queryParams.get('code') != null) {
-        setAuth(true)
-        let res = await notionAuth(queryParams.get('code'), FRONTEND_URL)
-        if (res === 401) {
-          let clean_uri = uri.substring(0, uri.indexOf("?"));
-          window.history.replaceState({}, document.title, clean_uri);
-        }
-        setNotionToken(res)
+  const notion_auth = async () => {
+    let uri = window.location.toString()
+    const queryParams = new URLSearchParams(uri.split('/')[3])
+
+    if (queryParams.get('code') != null) {
+      let res = await notionAuth(queryParams.get('code'), FRONTEND_URL)
+      if (res === 401) {
+        setAuth(false)
+      } else {
+        return res
       }
     }
+  }
 
-    notion_auth()
-  }, [setNotionToken])
+  useEffect(() => {
+    let uri = window.location.toString()
+    const queryParams = new URLSearchParams(uri.split('/')[3])
+
+    if (queryParams.get('code') != null) {
+      setAuth(true)
+    }
 
 
+  }, [])
 
 
   // numbered rendering in output
@@ -49,7 +52,7 @@ function App() {
 
   // url parsing logic
   const validateURL = (url, format, host) => {
-    
+
     try {
       let domain = new URL(url).hostname
 
@@ -72,11 +75,15 @@ function App() {
     let canvasDomain = ""
     let courseID = ""
     let dbID = ""
+    let notionToken = await notion_auth()
+
 
     try {
-
-      if(!auth){
-        throw Error ("You have not verified with Notion yet!")
+      if (notionToken === undefined) {
+        throw Error("Please Reauthorize")
+      }
+      if (!auth) {
+        throw Error("You have not verified with Notion yet!")
       }
 
       canvasDomain = validateURL(courseURL, /[a-zA-Z0-9]*\.instructure\.com/, 'Canvas Course')
@@ -93,7 +100,6 @@ function App() {
       if (canvasToken === '') {
         throw Error("Empty Canvas Token")
       }
-      handleSave()
 
       validateURL(databaseURL, /notion\.so/, 'Notion Database')
 
@@ -115,19 +121,6 @@ function App() {
   }
 
 
-
-  // function used to handle local storage saving
-  const handleSave = () => {
-    if (localSave) {
-      if (canvasToken.length > 0) {
-        localStorage.setItem('canvasToken', canvasToken)
-      }
-    } else {
-      localStorage.removeItem('canvasToken')
-    }
-  }
-
-
   return (
     <div className="App">
       <Toaster position="top-right" />
@@ -142,20 +135,15 @@ function App() {
             </button>
           </div> : false}
           <div className="paste-link flex">
-            {stepNumbering()}Paste the link to your course here: <input onChange={e => setCourseURL(e.target.value)} />
+            {stepNumbering()}Paste the link to your course here: <input value={courseURL} onChange={e => setCourseURL(e.target.value)} />
           </div>
           <div className="alias-class flex">
-            {stepNumbering()} Create an alias for your course: <input onChange={e => setCourseName(e.target.value)} />
+            {stepNumbering()} Create an alias for your course: <input value={courseName} onChange={e => setCourseName(e.target.value)} />
           </div>
 
           <div className="canvas-access-token">
             {stepNumbering()} Go to Canvas settings, scroll down, and click
             '+ New Access Token'. Paste your Access Token here:<input value={canvasToken} onChange={e => setCanvasToken(e.target.value)} />
-            <div className="local-storage text-sm ml-5 flex items-center">
-              <input className="form-check-input rounded-sm mr-2 checked:hover:bg-black checked:bg-black"
-                type="checkbox" checked={localSave} onChange={e => setLocalSave(e.target.checked)} />
-              Do you want to save this information to local storage?
-            </div>
           </div>
 
           <div className="duplicate-notion-table">
@@ -170,7 +158,7 @@ function App() {
 
           <div className="share-token">
             {stepNumbering()} While you're in the 'Share' panel,
-            copy the link to the table and paste it here:<input onChange={e => setDatabaseURL(e.target.value)} />
+            copy the link to the table and paste it here:<input value={databaseURL} onChange={e => setDatabaseURL(e.target.value)} />
           </div>
           <div>{stepNumbering()} If you have followed all of the above steps, press <button className="ml-2 py-1" onClick={() => handleGoClick()}>Go</button></div>
         </div>
