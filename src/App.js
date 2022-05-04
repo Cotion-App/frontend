@@ -6,13 +6,11 @@ import { FRONTEND_URL } from "./utils/constants.js";
 
 function App() {
   let counter = 0;
-  const [courseURL, setCourseURL] = useState('')
-  const [courseName, setCourseName] = useState('')
-  const [databaseURL, setDatabaseURL] = useState('')
-  const [canvasToken, setCanvasToken] = useState('')
+  const [databaseURL, setDatabaseURL] = useState(sessionStorage.getItem("shared-link") ?? "")
+  const [courseURL, setCourseURL] = useState(sessionStorage.getItem("course-link") ?? "")
+  const [courseAlias, setCourseAlias] = useState(sessionStorage.getItem("course-alias") ?? "")
+  const [canvasToken, setCanvasToken] = useState(sessionStorage.getItem("canvas-token") ?? "")
   const [auth, setAuth] = useState(false)
-
-
 
 
   const notion_auth = async () => {
@@ -87,7 +85,7 @@ function App() {
         throw Error("Invalid Canvas Course Link")
       }
 
-      if (courseName === '') {
+      if (courseAlias === '') {
         throw Error("Empty Course Alias")
       }
 
@@ -104,7 +102,7 @@ function App() {
       return;
     }
 
-    const myPromise = go(canvasDomain, canvasToken, courseID, courseName, dbID, notionToken);
+    const myPromise = go(canvasDomain, canvasToken, courseID, courseAlias, dbID, notionToken);
 
     toast.promise(myPromise, {
       loading: 'Loading',
@@ -121,19 +119,7 @@ function App() {
       <div className="content font-serif md:w-5/6 mx-auto p-5 max-w-xl select-none">
         <div className="header text-3xl pb-2 font-bold"> Cotion</div>
         <div className="body space-y-5 border-y-2 border-black py-4">
-          <div className="paste-link">
-            {stepNumbering()}Paste the link to your course here: <input value={courseURL} onChange={e => setCourseURL(e.target.value)} />
-          </div>
-          <div className="alias-class">
-            {stepNumbering()} Create an alias for your course: <input value={courseName} onChange={e => setCourseName(e.target.value)} />
-          </div>
-
-          <div className="canvas-access-token">
-            {stepNumbering()} Go to Canvas settings, scroll down, and click
-            '+ New Access Token'. Paste your Access Token here:<input value={canvasToken} onChange={e => setCanvasToken(e.target.value)} />
-          </div>
-
-          <div className="duplicate-notion-table">
+        <div className="duplicate-notion-table">
             {stepNumbering()} Duplicate this <a href="https://spectacled-rainforest-118.notion.site/97429db8eadd429b8914ca480516dabc?v=ada252446d0f45bea222df0fec729abe" target="_blank" rel="noreferrer">Notion Table</a>.
             Feel free to add additional columns to the table, but don't remove any existing columns!
           </div>
@@ -150,8 +136,31 @@ function App() {
 
           <div className="share-token">
             {stepNumbering()} While you're in the 'Share' panel,
-            copy the link to the table and paste it here:<input value={databaseURL} onChange={e => setDatabaseURL(e.target.value)} />
+            copy the link to the table and paste it here:<input value={databaseURL} onChange={e => {
+              sessionStorage.setItem("shared-link",e.target.value)
+              setDatabaseURL(e.target.value)
+            }} />
           </div>
+          <div className="paste-link">
+            {stepNumbering()}Paste the link to your course here: <input value={courseURL} onChange={e => {
+              sessionStorage.setItem("course-link", e.target.value)
+              setCourseURL(e.target.value)
+            }} />
+          </div>
+          <div className="alias-class">
+            {stepNumbering()} Create an alias for your course: <input value={courseAlias} onChange={e => {
+              sessionStorage.setItem("course-alias", e.target.value)
+              setCourseAlias(e.target.value)}} />
+          </div>
+
+          <div className="canvas-access-token">
+            {stepNumbering()} Go to Canvas settings, scroll down, and click
+            '+ New Access Token'. Paste your Access Token here:<input value={canvasToken} onChange={e => {
+              sessionStorage.setItem("canvas-token", e.target.value)
+              setCanvasToken(e.target.value)}} />
+          </div>
+
+          
           <div>{stepNumbering()} If you have followed all of the above steps, press <button className="ml-2 py-1" onClick={() => handleGoClick()}>Go</button></div>
         </div>
         <div className="footer mb-10 py-2 text-gray-400 flex items-center font-sans">
